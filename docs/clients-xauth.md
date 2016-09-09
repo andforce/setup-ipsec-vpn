@@ -4,20 +4,20 @@
 
 *To connect using IPsec/L2TP mode, see: [Configure IPsec/L2TP VPN Clients](clients.md)*
 
-After <a href="https://github.com/hwdsl2/setup-ipsec-vpn" target="_blank">setting up your own VPN server</a>, follow these steps to configure your devices. IPsec/XAuth is natively supported by Android, iOS and OS X. There is no additional software to install. Windows users can use the free <a href="https://www.shrew.net/download/vpn" target="_blank">Shrew Soft client</a>. In case you are unable to connect, first check to make sure the VPN credentials were entered correctly.
+After <a href="https://github.com/hwdsl2/setup-ipsec-vpn" target="_blank">setting up your own VPN server</a>, follow these steps to configure your devices. IPsec/XAuth ("Cisco IPsec") is natively supported by Android, iOS and OS X. There is no additional software to install. Windows users can use the free <a href="https://www.shrew.net/download/vpn" target="_blank">Shrew Soft client</a>. In case you are unable to connect, first check to make sure the VPN credentials were entered correctly.
 
-`IPsec/XAuth` mode is also called `Cisco IPsec`. Compared to `IPsec/L2TP`, it is generally faster with less overhead.
+`IPsec/XAuth` mode is also called "Cisco IPsec". Compared to `IPsec/L2TP`, it is generally faster with less overhead.
 
 ---
 * Platforms
   * [Windows](#windows)
-  * [OS X](#os-x)
+  * [OS X (macOS)](#os-x)
   * [Android](#android)
-  * [iOS](#ios)
+  * [iOS (iPhone/iPad)](#ios)
 
 ### Windows ###
 
-Note: You may also connect using [IPsec/L2TP mode](clients.md). No additional software is required.
+**Note:** You can also connect using [IPsec/L2TP mode](clients.md). No additional software is required.
 
 1. Download and install the free <a href="https://www.shrew.net/download/vpn" target="_blank">Shrew Soft VPN client</a>.
 1. Click Start Menu -> All Programs -> ShrewSoft VPN Client -> VPN Access Manager
@@ -26,24 +26,14 @@ Note: You may also connect using [IPsec/L2TP mode](clients.md). No additional so
 1. Click the **Authentication** tab. Select **Mutual PSK + XAuth** from the **Authentication Method** drop-down menu.
 1. Click the **Credentials** tab below. Enter `Your VPN IPsec PSK` in the **Pre Shared Key** field.
 1. Click the **Phase 1** tab. Select **main** from the **Exchange Type** drop-down menu.
+1. Click the **Phase 2** tab. Select **sha1** from the **HMAC Algorithm** drop-down menu.
 1. Click **Save** to save the VPN connection details.
 1. Select the new VPN connection. Click the **Connect** button on toolbar.
 1. Enter `Your VPN Username` in the **Username** field.
 1. Enter `Your VPN Password` in the **Password** field.
 1. Click **Connect**.
 
-Once connected, you will see **tunnel enabled** in the VPN Connect status window. You can verify that your traffic is being routed properly by <a href="https://encrypted.google.com/search?q=my+ip" target="_blank">looking up your IP address on Google</a>. It should say "Your public IP address is `Your VPN Server IP`".
-
-**Note:** A <a href="https://documentation.meraki.com/MX-Z/Client_VPN/Troubleshooting_Client_VPN#Windows_Error_809" target="_blank">one-time registry change</a> is required if the VPN server and/or client is behind NAT (e.g. home router). Please refer to the linked page, or run the following from an <a href="http://windows.microsoft.com/en-us/windows/command-prompt-faq#1TC=windows-7" target="_blank">elevated command prompt</a>. You must reboot your computer when done.
-- For Windows Vista and newer
-  ```console
-  REG ADD HKLM\SYSTEM\CurrentControlSet\Services\PolicyAgent /v AssumeUDPEncapsulationContextOnSendRule /t REG_DWORD /d 0x2 /f
-  ```
-
-- For Windows XP only
-  ```console
-  REG ADD HKLM\SYSTEM\CurrentControlSet\Services\IPSec /v AssumeUDPEncapsulationContextOnSendRule /t REG_DWORD /d 0x2 /f
-  ```
+Once connected, you will see **tunnel enabled** in the VPN Connect status window. Click the "Network" tab, and confirm that **Established - 1** is displayed under "Security Associations". You can verify that your traffic is being routed properly by <a href="https://encrypted.google.com/search?q=my+ip" target="_blank">looking up your IP address on Google</a>. It should say "Your public IP address is `Your VPN Server IP`".
 
 ### OS X ###
 1. Open System Preferences and go to the Network section.
@@ -56,13 +46,13 @@ Once connected, you will see **tunnel enabled** in the VPN Connect status window
 1. Enter `Your VPN Username` for the **Account Name**.
 1. Enter `Your VPN Password` for the **Password**.
 1. Click the **Authentication Settings** button.
-1. In the **Machine Authentication** section, select the **Shared Secret** radio button and enter `Your VPN IPsec PSK` as its value.
+1. In the **Machine Authentication** section, select the **Shared Secret** radio button and enter `Your VPN IPsec PSK`.
 1. Leave the **Group Name** field blank.
 1. Click **OK**.
 1. Check the **Show VPN status in menu bar** checkbox.
 1. Click **Apply** to save the VPN connection information.
 
-You can connect to the VPN using the VPN icon in the menu bar, or by selecting the VPN in the Network section of System Preferences and choosing **Connect**. You can verify that your traffic is being routed properly by <a href="https://encrypted.google.com/search?q=my+ip" target="_blank">looking up your IP address on Google</a>. It should say "Your public IP address is `Your VPN Server IP`".
+To connect to the VPN: Use the menu bar icon, or go to the Network section of System Preferences, select the VPN and choose **Connect**. You can verify that your traffic is being routed properly by <a href="https://encrypted.google.com/search?q=my+ip" target="_blank">looking up your IP address on Google</a>. It should say "Your public IP address is `Your VPN Server IP`".
 
 ### Android ###
 1. Launch the **Settings** application.
@@ -81,7 +71,10 @@ You can connect to the VPN using the VPN icon in the menu bar, or by selecting t
 1. Check the **Save account information** checkbox.
 1. Tap **Connect**.
 
-Note for Android 6 (Marshmallow) users: On the VPN server, edit `/etc/ipsec.conf` and append `,aes256-sha2_256` to both `ike=` and `phase2alg=` lines. Then add a new line `sha2-truncbug=yes` under section `conn shared` (<a href="https://libreswan.org/wiki/FAQ#Android_6.0_connection_comes_up_but_no_packet_flow" target="_blank">Reference</a>). Indent lines with two spaces. When finished, run `service ipsec restart`.
+**Note:** If unable to connect using Android 6 (Marshmallow), try these workarounds:
+
+1. Tap the settings icon next to your VPN profile. Select "Show Advanced Options" and scroll down to the bottom. If the option "Backwards-compatible mode" exists, enable it and reconnect the VPN. If not, skip to step 2.
+1. (Note: Latest version of the VPN scripts already include these changes) Edit `/etc/ipsec.conf` on the VPN server and append `,aes256-sha2_256` to both `ike=` and `phase2alg=` lines. Then add a new line `sha2-truncbug=yes` immediately after those. Indent lines with two spaces. Save the file and run `service ipsec restart`. (<a href="https://libreswan.org/wiki/FAQ#Android_6.0_connection_comes_up_but_no_packet_flow" target="_blank">Reference</a>)
 
 Once connected, you will see a VPN icon in the notification bar. You can verify that your traffic is being routed properly by <a href="https://encrypted.google.com/search?q=my+ip" target="_blank">looking up your IP address on Google</a>. It should say "Your public IP address is `Your VPN Server IP`".
 
@@ -100,7 +93,7 @@ Once connected, you will see a VPN icon in the notification bar. You can verify 
 
 Once connected, you will see a VPN icon in the status bar. You can verify that your traffic is being routed properly by <a href="https://encrypted.google.com/search?q=my+ip" target="_blank">looking up your IP address on Google</a>. It should say "Your public IP address is `Your VPN Server IP`".
 
-## Acknowledgement
+## Credits
 
 This document was adapted from the <a href="https://github.com/jlund/streisand" target="_blank">Streisand</a> project by Joshua Lund and contributors.
 
